@@ -1,0 +1,67 @@
+- hosts: localhost
+  name: Install Docker
+  become: yes
+  vars:
+    docker_group: "docker"
+    ansible_user: "{{ lookup('env', 'USER') }}"
+  tasks:
+    - name: Installer les dependances
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - curl
+        state: latest
+        update_cache: true
+
+    - name: architecture du systeme
+      command: dpkg --print-architecture
+      register: architecture
+
+    - name: Nom de code de la version Debian
+      command: lsb_release -cs
+      register: debian_version
+
+    - name: Telecharger le fichier docker.asc
+      get_url:
+        url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+        dest: "/etc/apt/keyrings/docker.asc"
+
+    - name: Contenu du fichier docker.list
+      set_fact:
+        docker_list_content: "deb [arch={{ architecture.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ debian_version.stdout }} stable"
+
+    - name: Ajouter le contenu docker.list
+      lineinfile:
+        path: /etc/apt/sources.list.d/docker.list
+        line: "{{ docker_list_content }}"
+        create: yes
+        state: present
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose
+          - docker-compose-plugin
+        state: latest
+        update_cache: true
+
+    - name: Demarrer et activer le service docker
+      ansible.builtin.service:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Creer de groupe docker
+      group:
+        name: "{{ docker_group }}"
+        state: present
+
+    - name: Ajouter l'utilisateur courant au groupe docker
+      user:
+        name: "{{ ansible_user }}"
+        group: "{{ docker_group }}"

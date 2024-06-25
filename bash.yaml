@@ -1,0 +1,25 @@
+---
+- name: Install and configure Starship prompt
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Starship prompt
+      shell: curl -sS https://starship.rs/install.sh | sh
+
+    - name: Initialize Starship in bash
+      lineinfile:
+        path: ~/.bashrc
+        line: 'eval "$(starship init bash)"'
+        create: yes
+
+    - name: Create configuration directory for Starship
+      file:
+        path: ~/.config
+        state: directory
+        mode: '0755'
+
+    - name: Copy starship.toml configuration
+      copy:
+        src: ressources/starship.toml
+        dest: ~/.config/starship.toml
+        mode: '0644'

@@ -5,6 +5,16 @@ is_root() {
   [ "$(id -u)" -eq 0 ]
 }
 
+# Fonction pour vérifier si ansible est déjà installé
+is_ansible_installed() {
+  if command -v ansible > /dev/null; then
+    echo "Ansible is already installed."
+    return 0
+  else
+    return 1
+  fi
+}
+
 # Installation de pipx
 install_pipx() {
   if is_root; then
@@ -28,9 +38,19 @@ ensure_pipx_path() {
   pipx ensurepath
 }
 
+# Vérifier et installer ansible si nécessaire
+install_ansible_if_needed() {
+  if is_ansible_installed; then
+    echo "Skipping ansible-core installation."
+  else
+    echo "Ansible is not installed with default packet manager. Proceeding with pipx installation."
+    install_pipx
+    install_ansible_core
+    ensure_pipx_path
+  fi
+}
+
 # Exécution des fonctions
-install_pipx
-install_ansible_core
-ensure_pipx_path
+install_ansible_if_needed
 
 echo "Script execution completed."

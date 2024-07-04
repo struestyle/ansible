@@ -53,4 +53,4 @@ install_ansible_if_needed() {
 # Exécution des fonctions
 install_ansible_if_needed
 
-echo "Script execution completed."
+echo "Script execution completed. Make sure to reauthenticate to take change of pipx ensured path"

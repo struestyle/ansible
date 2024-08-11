@@ -1,0 +1,32 @@
+---
+- name: Télécharger une nouvelle image ISO dans Proxmox VE
+  hosts: proxmox
+  become: yes
+
+  vars:
+    iso_url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+    iso_name: "noble-server-cloudimg-amd64.img"
+    storage_path: "/mnt/pve/dir01/template/iso"
+
+  tasks:
+    - name: Créer le répertoire de stockage s'il n'existe pas
+      file:
+        path: "{{ storage_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Télécharger l'image ISO
+      get_url:
+        url: "{{ iso_url }}"
+        dest: "{{ storage_path }}/{{ iso_name }}"
+        mode: '0644'
+
+    - name: Vérifier que l'image ISO est téléchargée
+      stat:
+        path: "{{ storage_path }}/{{ iso_name }}"
+      register: iso_file
+
+    - name: Afficher un message si le téléchargement a réussi
+      debug:
+        msg: "L'image ISO a été téléchargée avec succès : {{ iso_file.stat.path }}"
+      when: iso_file.stat.exists

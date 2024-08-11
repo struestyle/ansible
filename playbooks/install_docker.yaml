@@ -23,6 +23,12 @@
       command: lsb_release -cs
       register: debian_version
 
+    - name: Créer le répertoire /etc/apt/keyrings s'il n'existe pas
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
     - name: Telecharger le fichier docker.asc
       get_url:
         url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"

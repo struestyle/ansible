@@ -1,0 +1,24 @@
+- name: Install and configure unattended-upgrades
+  hosts: all  # Vous pouvez ajuster selon vos besoins, par exemple 'webserver' ou 'dbserver'
+  tasks:
+  - name: Update apt cache
+    apt:
+    update_cache: yes
+
+  - name: Install unattended-upgrades package
+    apt:
+    name: unattended-upgrades
+    state: present
+
+  - name: Copy unattended-upgrades configuration file
+    copy:
+    src: ressources/unattended-upgrades/50unattended-upgrades
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: 0644
+
+  - name: Restart unattended-upgrades service
+    service:
+    name: unattended-upgrades
+    state: restarted

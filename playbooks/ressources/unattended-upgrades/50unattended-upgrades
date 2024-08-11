@@ -1,0 +1,22 @@
+// Enable automatic updates and upgrades for all packages
+Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}";
+    "${distro_id}:${distro_codename}-*";
+    "Docker:${distro_codename}";
+};
+
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+Unattended-Upgrade::AllowUnauthenticated "false";
+Unattended-Upgrade::MinimalSteps "true";
+Dpkg::Options {
+    "--force-confdef";
+    "--force-confold";
+};
+
+
+// Do automatic removal of unused dependencies after upgrade
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+// Automatically reboot if necessary after package upgrades
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "02:00";

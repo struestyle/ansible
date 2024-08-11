@@ -1,0 +1,19 @@
+---
+- name: Run whoami in all Docker containers
+  hosts: localhost
+
+  tasks:
+    - name: Gather list of Docker containers with their names
+      command: docker ps --format "{{ '{{' }}.ID{{ '}}' }} {{ '{{' }}.Names{{ '}}' }}"
+      register: container_list
+
+    - name: Print whoami in each container
+      command: docker exec {{ item.split(' ')[0] }} whoami
+      with_items: "{{ container_list.stdout_lines }}"
+      register: whoami_outputs
+      ignore_errors: yes
+
+    - name: Display the whoami output from each container
+      debug:
+        msg: "Container {{ item.item.split(' ')[1] }}: {{ item.stdout }}"
+      with_items: "{{ whoami_outputs.results }}"

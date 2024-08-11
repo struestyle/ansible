@@ -1,0 +1,19 @@
+---
+- name: Run date in all Docker containers
+  hosts: localhost
+
+  tasks:
+    - name: Gather list of Docker containers
+      command: docker ps -q
+      register: container_list
+
+    - name: Print date in each container
+      command: docker exec {{ item }} date
+      with_items: "{{ container_list.stdout_lines }}"
+      register: date_outputs
+      ignore_errors: yes
+
+    - name: Display the date output from each container
+      debug:
+        msg: "Container {{ item.item }}: {{ item.stdout }}"
+      with_items: "{{ date_outputs.results }}"

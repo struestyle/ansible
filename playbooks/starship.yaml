@@ -1,7 +1,6 @@
 ---
 - name: Install and configure Starship prompt
-  hosts: all
-  become: yes
+  hosts: localhost
   tasks:
     - name: Install Starship prompt
       shell: curl -sS https://starship.rs/install.sh | sh
